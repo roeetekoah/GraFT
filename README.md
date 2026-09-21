@@ -15,15 +15,13 @@ contains the GraFT pipeline: an alignment-free k-mer Jaccard workflow for
 detecting horizontal gene transfer (HGT) candidates across bacterial proteomes
 without whole-genome alignment or phylogenetic reconstruction.
 
-GraFT is built around one idea: suspicious transfers can be surfaced by treating
-proteins as a cross-species similarity graph and scoring the graph for unusually
-strong, species-pair-normalized connections.
+GraFT asks which proteins are unusually similar across species relative to each
+species pair's own background, and whether those similarities form informative
+graph structures. Its output is a ranked set of candidates for biological
+follow-up; graph anomalies alone do not establish a transfer event.
 
-The pipeline asks:
-
-- Which proteins are unexpectedly similar across species boundaries?
-- Which species-pair connections are unusually strong relative to their own background?
-- Which graph components concentrate HGT-like signal rather than diffuse similarity noise?
+**Explore:** [read the paper](paper/main.pdf), [run the saved graph](#getting-started),
+or [inspect the component figures](#results-and-figures).
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-%3E%3D3.9-3776AB?logo=python&logoColor=white" alt="python >= 3.9">
@@ -89,15 +87,16 @@ Two entry paths are supported:
 | Path | Start From | Best For |
 |---|---|---|
 | Shortcut | `golden/reference_inputs/edges_PRUNED_JACCARD_92790.tsv` | Fast reproduction of the analysis pipeline. |
-| Full E2E | `data/assembly_summary_refseq.txt` + `config/species.txt` | Rebuilding the graph input from RefSeq metadata and downloaded proteomes. |
+| Fresh-data run | `data/assembly_summary_refseq.txt` + `config/species.txt` | Building a new graph from RefSeq metadata and downloaded proteomes; not an exact replay of the historical graph. |
 
 ---
 
 ## Method
 
-The pipeline operates on 48 bacterial species spanning 19 families. It avoids
-pairwise protein alignment during graph construction by using k-mer overlap and
-Jaccard similarity.
+The saved analysis graph contains **37,421 proteins, 92,790 edges, and 5,262
+connected components across 50 species**. These counts can be checked directly
+against the tracked input and output tables under `golden/`. Graph construction
+uses k-mer overlap and Jaccard similarity in place of pairwise protein alignment.
 
 ```text
 Protein FASTAs from RefSeq
@@ -112,7 +111,7 @@ Step 2: Candidate edge generation
         |
         v
 Step 3: Graph pruning
-        Apply percentile Jaccard filtering and top-X edges per node.
+        Apply species-pair Jaccard quantiles and top-X rows per source endpoint.
         |
         v
 Step 4: Connected component analysis
@@ -296,9 +295,11 @@ python tools\reporting\plot_components.py `
 ## Reproducibility
 
 For a concise reviewer-facing recipe, see [`REPRODUCE.md`](REPRODUCE.md).
+Start with the tracked graph to reproduce the saved analysis. A fresh-data run
+can select different RefSeq assemblies and produce a different graph.
 
 <details>
-<summary>Full E2E recipe from RefSeq assembly metadata</summary>
+<summary>Fresh-data workflow from RefSeq assembly metadata</summary>
 
 Install once:
 
@@ -383,7 +384,7 @@ python tools\reporting\explain_top_candidates.py --edges tmp\e2e\pipeline_bw\edg
 
 ## Testing
 
-Run the fast regression suite from the repository root:
+Run the graph regression suite from the repository root:
 
 ```powershell
 python tests\test_regression_baselines.py --mode graph
@@ -393,6 +394,7 @@ Other modes:
 
 | Mode | Coverage |
 |---|---|
+| `fast` | Small graph-construction fixtures and reporting checks. |
 | `graph` | Default no-betweenness regression and fast checks. |
 | `graph_bw` | Includes betweenness-on regression. |
 | `full` | Includes the heavier full k-mer regression when local data exists. |

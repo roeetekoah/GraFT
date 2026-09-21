@@ -5,14 +5,13 @@ import argparse
 
 
 def keep_q_percentile_edges(df, q=0.9):
-    """Keep only the top q percent of edges based on jaccard, for each pair (u,v)"""
+    """Keep edges at or above quantile q within each unordered species pair."""
     copy = df.copy()
     copy["species_pair"] = copy.apply(
         lambda r: tuple(sorted([r["species_u"], r["species_v"]])),
         axis=1
     )
 
-    q = 0.9  # keep top 10% per species pair
     # Compute per-pair quantile threshold
     thresholds = copy.groupby("species_pair")["jaccard"].transform(
         lambda x: x.quantile(q)
@@ -23,9 +22,14 @@ def keep_q_percentile_edges(df, q=0.9):
 
 
 def keep_top_X_edges_per_node(df, X=20):
-    """For each node u, keep top k edges (u,v) based on jaccard"""
-    top_edges = df.groupby('u').apply(lambda x: x.nlargest(X, 'jaccard')).reset_index(drop=True)
-    return top_edges
+    """Keep top-X rows per stored u endpoint, with input-order tie breaking.
+
+    This is not a cap on undirected degree: a node can also occur in v.
+    """
+    groups = [group.nlargest(X, 'jaccard') for _, group in df.groupby('u')]
+    if not groups:
+        return df.iloc[:0].copy().reset_index(drop=True)
+    return pd.concat(groups, ignore_index=True)
 
 
 def plots(df_before, df_after):

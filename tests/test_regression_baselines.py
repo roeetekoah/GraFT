@@ -21,6 +21,28 @@ RUN_GRAPH_PIPELINE_BW_REGRESSION = False
 RUN_KMER_FULL_REGRESSION = False
 
 
+def assert_pipeline_table_equal(actual, expected, name):
+    """Keep identifiers and scoring exact; allow one serialized diagnostic unit."""
+    diagnostic = "top5_mean_jac"
+    if name == "protein_features.tsv":
+        # Different floating-point summation methods can round a mean to
+        # adjacent six-decimal values. No other field gets this allowance.
+        pd.testing.assert_frame_equal(
+            actual.drop(columns=[diagnostic]),
+            expected.drop(columns=[diagnostic]),
+            check_dtype=False,
+            check_exact=True,
+        )
+        pd.testing.assert_series_equal(
+            actual[diagnostic], expected[diagnostic], check_dtype=False,
+            check_exact=False, rtol=0, atol=1e-6 + 1e-12,
+        )
+    else:
+        pd.testing.assert_frame_equal(
+            actual, expected, check_dtype=False, check_exact=True,
+        )
+
+
 def load_module(module_path: Path, module_name: str):
     spec = importlib.util.spec_from_file_location(module_name, module_path)
     if spec is None or spec.loader is None:
@@ -99,7 +121,7 @@ class RegressionBaselines(unittest.TestCase):
             ]:
                 actual = pd.read_csv(out_dir / name, sep="\t")
                 expected = pd.read_csv(golden_pipeline_dir / "rerun_pruned" / name, sep="\t")
-                pd.testing.assert_frame_equal(actual, expected, check_dtype=False)
+                assert_pipeline_table_equal(actual, expected, name)
 
             results_dir = tmp_dir / "results"
             results_dir.mkdir(parents=True, exist_ok=True)
@@ -218,6 +240,52 @@ class RegressionBaselines(unittest.TestCase):
 
         self.assertEqual(len(top_edges), len(expected))
         pd.testing.assert_frame_equal(top_edges, expected, check_like=False, check_dtype=False)
+
+    def test_quantile_parameter_and_unordered_species_pairs(self):
+        pruning = load_module(GRAPH_CONSTRUCTION_DIR / "graph_pruning.py", "graph_pruning")
+        edges = pd.DataFrame({
+            "u": ["a", "b", "c", "d", "e", "f"],
+            "v": ["v1", "v2", "v3", "v4", "v5", "v6"],
+            "species_u": ["A", "B", "A", "B", "C", "C"],
+            "species_v": ["B", "A", "B", "A", "D", "D"],
+            "jaccard": [0.1, 0.2, 0.3, 0.4, 0.8, 0.9],
+        })
+        original = edges.copy(deep=True)
+        self.assertEqual(pruning.keep_q_percentile_edges(edges, q=0.5).u.tolist(), ["c", "d", "f"])
+        self.assertEqual(pruning.keep_q_percentile_edges(edges, q=0.9).u.tolist(), ["d", "f"])
+        pd.testing.assert_frame_equal(edges, original)
+
+    def test_endpoint_pruning_preserves_columns_order_and_ties(self):
+        pruning = load_module(GRAPH_CONSTRUCTION_DIR / "graph_pruning.py", "graph_pruning")
+        edges = pd.DataFrame({
+            "u": ["b", "a", "a", "a", "b"],
+            "v": ["x", "y", "z", "w", "q"],
+            "jaccard": [0.2, 0.8, 0.8, 0.1, 0.9],
+            "annotation": ["b-low", "first-tie", "second-tie", "a-low", "b-high"],
+        }, index=[9, 9, 4, 7, 4])
+        original = edges.copy(deep=True)
+        expected = edges.iloc[[1, 4]].reset_index(drop=True)
+        pd.testing.assert_frame_equal(pruning.keep_top_X_edges_per_node(edges, X=1), expected)
+        pd.testing.assert_frame_equal(pruning.keep_top_X_edges_per_node(edges.iloc[:0], X=1), edges.iloc[:0].reset_index(drop=True))
+        pd.testing.assert_frame_equal(edges, original)
+
+    def test_numeric_allowance_is_limited_to_one_diagnostic_unit(self):
+        expected = pd.DataFrame({"u": ["p"], "top5_mean_jac": [0.095102], "max_z": [3.0]})
+        actual = expected.copy()
+        actual.loc[0, "top5_mean_jac"] = 0.095103
+        assert_pipeline_table_equal(actual, expected, "protein_features.tsv")
+        actual.loc[0, "top5_mean_jac"] = 0.095104
+        with self.assertRaises(AssertionError):
+            assert_pipeline_table_equal(actual, expected, "protein_features.tsv")
+        actual = expected.copy()
+        actual.loc[0, "max_z"] += 1e-6
+        with self.assertRaises(AssertionError):
+            assert_pipeline_table_equal(actual, expected, "protein_features.tsv")
+        scores = pd.DataFrame({"u": ["p"], "score": [3.0]})
+        changed = scores.copy()
+        changed.loc[0, "score"] += 1e-6
+        with self.assertRaises(AssertionError):
+            assert_pipeline_table_equal(changed, scores, "all_scores.tsv")
 
     def test_graph_pipeline_matches_pruned_and_results_baselines(self):
         if not RUN_GRAPH_PIPELINE_REGRESSION:
