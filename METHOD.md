@@ -54,6 +54,10 @@ for the tracked analysis; a fresh RefSeq download may produce a different graph.
 
 ## Code map
 
+The implementation uses Python, NetworkX, pandas, and Matplotlib. The manuscript
+is self-contained under [`paper/`](paper/), including its [source](paper/main.tex),
+[PDF](paper/main.pdf), and [figures](paper/figures/).
+
 | Path | Notes |
 |---|---|
 | `src/graft/graph_construction/refseq_fetch_proteins.py` | Builds a manifest from NCBI assembly metadata and optionally downloads protein FASTAs. |
@@ -66,6 +70,37 @@ for the tracked analysis; a fresh RefSeq download may produce a different graph.
 The editable distribution is `graft-hgt`; the importable package is `graft`.
 Installation also provides the `graft`, `graft-graph`, and `graft-fetch-refseq`
 command-line entry points.
+
+## Repository layout
+
+```text
+.
+|-- config/
+|   `-- species.txt
+|-- data/
+|   `-- out_refseq/                 # local RefSeq-derived outputs when present
+|-- paper/
+|   `-- figures/
+|-- golden/
+|   |-- reference_inputs/
+|   |-- bw_pipeline/
+|   |-- no_bw_pipeline/
+|   `-- hackathon_report_refs/
+|-- src/
+|   `-- graft/
+|       |-- graph_construction/
+|       |-- pipeline.py
+|       `-- stages/
+|-- tests/
+|-- tools/
+|   |-- reporting/
+|   |-- REPRODUCE.md
+|   `-- reproduce.py
+|-- METHOD.md
+|-- REPRODUCE.md
+|-- pyproject.toml
+`-- README.md
+```
 
 ## Inputs and outputs
 

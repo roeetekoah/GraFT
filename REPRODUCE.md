@@ -101,6 +101,7 @@ No-betweenness reports:
 ```powershell
 python tools/reporting/top_anomaly_edges.py `
   --edges tmp/e2e_review/run/pipeline_no_bw/edge_features.tsv `
+  --protein_features tmp/e2e_review/run/pipeline_no_bw/protein_features.tsv `
   --top_n 25 `
   --out_dir tmp/e2e_review/run/pipeline_no_bw/results
 
@@ -117,6 +118,7 @@ Betweenness-on reports + explanations:
 ```powershell
 python tools/reporting/top_anomaly_edges.py `
   --edges tmp/e2e_review/run/pipeline_bw/edge_features.tsv `
+  --protein_features tmp/e2e_review/run/pipeline_bw/protein_features.tsv `
   --top_n 25 `
   --out_dir tmp/e2e_review/run/pipeline_bw/results
 
@@ -153,6 +155,9 @@ each analysis mode against its corresponding reference artifacts. These checks
 verify implementation consistency, not biological confirmation of HGT.
 
 Note:
+- Large raw downloads are kept out of version control. The tracked manifest,
+  canonical graph, and regression outputs allow saved-graph checks without
+  downloading the full proteomes.
 - `data/assembly_summary_refseq.txt` is large and not tracked by git.
 - Download from NCBI when needed:
 

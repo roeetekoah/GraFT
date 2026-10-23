@@ -36,6 +36,10 @@ not confirmed transfer events.
 - [Component 8](updated_plots/topk/component_8.png)
 - [Component 32](updated_plots/topk/component_32.png)
 
+The README uses equal-sized previews under `updated_plots/previews/`. Each
+complete figure is scaled to fit the same white canvas, without stretching or
+cropping, and links to its unchanged full-resolution image under `topk/`.
+
 Recreate the views from the repository root:
 
 ```powershell

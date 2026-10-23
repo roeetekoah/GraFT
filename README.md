@@ -31,9 +31,10 @@ Protein-similarity graphs from the saved analysis. Colors distinguish species,
 node size reflects candidate score, and black edges highlight unusually strong
 similarities. Click a preview for the full-resolution figure.
 
-| Component 5 | Component 8 | Component 32 |
-|---|---|---|
-| [![Component 5 high-resolution graph](artifacts/updated_plots/topk/component_5.png)](artifacts/updated_plots/topk/component_5.png) | [![Component 8 high-resolution graph](artifacts/updated_plots/topk/component_8.png)](artifacts/updated_plots/topk/component_8.png) | [![Component 32 high-resolution graph](artifacts/updated_plots/topk/component_32.png)](artifacts/updated_plots/topk/component_32.png) |
+<table width="100%">
+<tr><th width="33%">Component 5</th><th width="33%">Component 8</th><th width="33%">Component 32</th></tr>
+<tr><td width="33%" valign="top"><a href="artifacts/updated_plots/topk/component_5.png"><img src="artifacts/updated_plots/previews/component_5.png" width="100%" alt="Component 5 protein-similarity graph"></a></td><td width="33%" valign="top"><a href="artifacts/updated_plots/topk/component_8.png"><img src="artifacts/updated_plots/previews/component_8.png" width="100%" alt="Component 8 protein-similarity graph"></a></td><td width="33%" valign="top"><a href="artifacts/updated_plots/topk/component_32.png"><img src="artifacts/updated_plots/previews/component_32.png" width="100%" alt="Component 32 protein-similarity graph"></a></td></tr>
+</table>
 
 [Output formats and plotting commands →](artifacts/README.md)
 
