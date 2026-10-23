@@ -1,21 +1,19 @@
 # Regression Tests
 
-Run from repository root:
+Run from the repository root after installation:
 
-```powershell
-python tests/test_regression_baselines.py
-```
-
-Modes:
-- `graph` (default): no-betweenness pipeline regression + fast checks
-- `graph_bw`: includes betweenness-on regression
-- `full`: includes heavy full k-mer regression (only if full local data exists)
-
-Examples:
-
-```powershell
+```sh
 python tests/test_regression_baselines.py --mode graph
-python tests/test_regression_baselines.py --mode graph_bw
-python tests/test_regression_baselines.py --mode full
 ```
 
+| Mode | Coverage |
+|---|---|
+| `fast` | Small graph-construction fixtures and reporting checks. |
+| `graph` (default) | No-betweenness pipeline regression and fast checks. |
+| `graph_bw` | Also includes betweenness-on regression. |
+| `full` | Also includes the heavier full k-mer regression, when local data exists. |
+
+Compare each analysis mode with its matching baseline under [`golden/`](../golden/).
+Regression checks verify implementation consistency, not biological confirmation
+of HGT. See the [reproduction guide](../REPRODUCE.md) for the saved-graph workflow
+and the recorded verification environment.

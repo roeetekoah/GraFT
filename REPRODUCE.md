@@ -10,7 +10,7 @@ and is not an exact replay of the historical graph construction.
 
 ## Environment
 
-From repository root (PowerShell):
+Requires Python 3.9 or newer and `pip`. From the repository root (PowerShell):
 
 ```powershell
 python -m pip install -e .
@@ -134,6 +134,9 @@ python tools/reporting/explain_component.py --component_id 8 --edges tmp/e2e_rev
 python tools/reporting/explain_component.py --component_id 32 --edges tmp/e2e_review/run/pipeline_bw/edge_features.tsv --protein_features tmp/e2e_review/run/pipeline_bw/protein_features.tsv --component_features tmp/e2e_review/run/pipeline_bw/component_features.tsv --hgt_candidates tmp/e2e_review/run/pipeline_bw/hgt_candidates.tsv --top_nodes 20 --top_edges 25
 python tools/reporting/explain_top_candidates.py --edges tmp/e2e_review/run/pipeline_bw/edge_features.tsv --protein_features tmp/e2e_review/run/pipeline_bw/protein_features.tsv --component_features tmp/e2e_review/run/pipeline_bw/component_features.tsv --hgt_candidates tmp/e2e_review/run/pipeline_bw/hgt_candidates.tsv --top_n 20 --top_k_neighbors 12
 ```
+
+Output formats and component-plot commands are documented in
+[`artifacts/README.md`](artifacts/README.md).
 
 ## D) Reference Artifacts and Verification Scope
 
