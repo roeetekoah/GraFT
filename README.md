@@ -1,14 +1,9 @@
-<table>
-  <tr>
-    <td width="220" align="center">
-      <img src="assets/logo-readme-lockup-card.png" alt="GraFT logo" width="190">
-    </td>
-    <td>
-      <h1>GraFT: Graph-based Finder of Transfers</h1>
-      <p><strong>Alignment-Free Detection of Horizontal Gene Transfer Candidates via Protein Similarity Graphs and Anomaly Scoring</strong></p>
-    </td>
-  </tr>
-</table>
+<picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="assets/hero-mobile-dark.svg">
+  <source media="(max-width: 600px)" srcset="assets/hero-mobile-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.svg">
+  <img src="assets/hero-light.svg" width="100%" alt="GraFT — Graph-based Finder of Transfers. Alignment-free protein similarity graphs for horizontal gene transfer candidates.">
+</picture>
 
 **GraFT** stands for **Gra**ph-based **F**inder of **T**ransfers. This repository
 contains the GraFT pipeline: an alignment-free k-mer Jaccard workflow for
